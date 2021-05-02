@@ -87,12 +87,13 @@ class DoublyLinkedList:
                     index = index.nref  
                 current = current.nref
 
-    def change(self,x,y,z):
+    def change(self,x,y,z,l):
         n = self.start_node
         while n is not None:
             if n.item[0]==x:
                 n.item[0]=y
                 n.item[1]=z
+                n.item[2]=l
             n=n.nref
 
     def returned(self,x):
@@ -104,24 +105,25 @@ class DoublyLinkedList:
 
 
 
-
+import tkinter as tk
 from tkinter import *
 
 
+
 root = Tk()
-root.geometry('400x400')
+root.geometry('500x500')
 root.config(bg = 'SlateGray3')
 root.title('Contact Book')
 root.resizable(0,0)
 k=DoublyLinkedList()
 
 contactlist = [
-    ['Pranav',  '9546273814'],
-    ['karthik',  '7846378245'],
-    ['sushil',   '8343734738'],
-    ['priya','8988237793'],
-    ['tharun',   '6782849482'],
-    ['charan' , '8349384894'],
+    ['Pranav',  '9546273814', 'pranav@gmail.com',],
+    ['karthik',  '7846378245', 'karthick@gmail.com',],
+    ['sushil',   '8343734738', 'susilkessav007@gmail.com',],
+    ['priya','8988237793', 'priya@gmail.com',],
+    ['tharun',   '6782849482', 'tharun@yahoo.com',],
+    ['charan' , '8349384894', 'charan@outlook.com',],
     ]
 
 contactlist.sort()
@@ -132,8 +134,12 @@ for i in range(len(contactlist)):
 
 
 
+
 Name = StringVar()
 Number = StringVar()
+Email = StringVar()
+Subject = StringVar()
+Body = StringVar()
 
 
 
@@ -154,13 +160,13 @@ def Selected():
     
 
 def AddContact():
-    k.insert_at_end([Name.get(), Number.get()])
+    k.insert_at_end([Name.get(), Number.get(), Email.get()])
     
     Select_set()
     
 
 def EDIT():
-    k.change(select.get(Selected()), Name.get(), Number.get())
+    k.change(select.get(Selected()), Name.get(), Number.get(), Email.get())
     Select_set()
     
 def DELETE():
@@ -175,6 +181,7 @@ def VIEW():
     s = k.returned(select.get(Selected()))
     Name.set(s[0])
     Number.set(s[1])
+    Email.set(s[2])
 
 
 def EXIT():
@@ -183,6 +190,52 @@ def EXIT():
 def RESET():
     Name.set('')
     Number.set('')
+    Email.set('')
+
+import smtplib
+from email.message import EmailMessage
+
+def SEND():
+        s = k.returned(select.get(Selected()))
+    
+        msg= EmailMessage()
+
+        my_address ="ghnateesh10@gmail.com"    #sender address
+
+        app_generated_password = "oqvgrejhgwhmbazp"    # gmail generated password
+
+        msg["Subject"] = Subject.get()   #email subject 
+
+        msg["From"]= my_address      #sender address
+
+        msg["To"] = s[2]     #reciver address
+
+        msg.set_content(Body.get())   #message body
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            
+            smtp.login(my_address,app_generated_password)    #login gmail account
+            
+            print("sending mail")
+            smtp.send_message(msg)   #send message 
+            print("mail has sent")
+    
+
+def createNewWindow():
+    newWindow = tk.Toplevel(root)
+    newWindow.geometry('500x200')
+    newWindow.config(bg = 'SlateGray3')
+    newWindow.title('Send Mail')
+    newWindow.resizable(0,0)
+    Label(newWindow, text = 'SUBJECT', font='arial 12 bold', bg = 'SlateGray3').place(x= 30, y=20)
+    Entry(newWindow, textvariable = Subject).place(x= 120, y=20)
+    Label(newWindow, text = 'BODY', font='arial 12 bold',bg = 'SlateGray3').place(x= 30, y=45)
+    Entry(newWindow, textvariable = Body).place(x= 130, y=45, width= 300, height= 100)
+    Button(newWindow,text=" SEND", font='arial 12 bold',bg='SlateGray4', command = SEND).place(x= 50, y=110)
+    
+
+    
+
 
 
 def Select_set() :
@@ -198,8 +251,10 @@ Select_set()
 
 Label(root, text = 'NAME', font='arial 12 bold', bg = 'SlateGray3').place(x= 30, y=20)
 Entry(root, textvariable = Name).place(x= 100, y=20)
-Label(root, text = 'PHONE NO.', font='arial 12 bold',bg = 'SlateGray3').place(x= 30, y=70)
-Entry(root, textvariable = Number).place(x= 130, y=70)
+Label(root, text = 'PHONE NO.', font='arial 12 bold',bg = 'SlateGray3').place(x= 30, y=45)
+Entry(root, textvariable = Number).place(x= 130, y=45)
+Label(root, text = 'EMAIL', font='arial 12 bold',bg = 'SlateGray3').place(x= 30, y=80)
+Entry(root, textvariable = Email).place(x= 130, y=80)
 
 Button(root,text=" ADD", font='arial 12 bold',bg='SlateGray4', command = AddContact).place(x= 50, y=110)
 Button(root,text="EDIT", font='arial 12 bold',bg='SlateGray4',command = EDIT).place(x= 50, y=260)
@@ -207,7 +262,7 @@ Button(root,text="DELETE", font='arial 12 bold',bg='SlateGray4',command = DELETE
 Button(root,text="VIEW", font='arial 12 bold',bg='SlateGray4', command = VIEW).place(x= 50, y=160)
 Button(root,text="EXIT", font='arial 12 bold',bg='tomato', command = EXIT).place(x= 300, y=320)
 Button(root,text="RESET", font='arial 12 bold',bg='SlateGray4', command = RESET).place(x= 50, y=310)
-
+Button(root,text="MAIL", font='arial 12 bold',bg='SlateGray4', command = createNewWindow).place(x= 200, y=320)
 
 root.mainloop()
   
