@@ -87,13 +87,14 @@ class DoublyLinkedList:
                     index = index.nref  
                 current = current.nref
 
-    def change(self,x,y,z,l):
+    def change(self,x,y,z,l,p):
         n = self.start_node
         while n is not None:
             if n.item[0]==x:
                 n.item[0]=y
                 n.item[1]=z
                 n.item[2]=l
+                n.item[3]=p
             n=n.nref
 
     def returned(self,x):
@@ -101,7 +102,37 @@ class DoublyLinkedList:
         while n is not None:
             if n.item[0]==x:
                 return n.item
-            n=n.nref            
+            n=n.nref 
+
+    def backup(self):
+        if self.start_node is None:
+            print("List has no element")
+            return
+        else:
+            x=0
+            n = self.start_node
+            while n is not None:
+                x=x+1
+                n = n.nref
+
+        
+        t="D"+str(x)
+        sheet_1['G1'].value=x
+        if self.start_node is None:
+            print("List has no element")
+            return
+        else:
+            n = self.start_node
+            while n is not None:
+                multiple_cells = sheet_1['A1':t]
+                for row in multiple_cells:
+                    i=0
+                    for cell in row:
+                        cell.value=n.item[i]
+                        
+                        i=i+1
+                    n = n.nref
+        work_book.save("/home/susil/Desktop/ContactBook_Python/sample.xlsx")
 
 
 
@@ -117,22 +148,28 @@ root.title('Contact Book')
 root.resizable(0,0)
 k=DoublyLinkedList()
 
-contactlist = [
-    ['Pranav',  '9546273814', 'pranav@gmail.com',],
-    ['karthik',  '7846378245', 'karthick@gmail.com',],
-    ['sushil',   '8343734738', 'susilkessav007@gmail.com',],
-    ['priya','8988237793', 'priya@gmail.com',],
-    ['tharun',   '6782849482', 'tharun@yahoo.com',],
-    ['charan' , '8349384894', 'charan@outlook.com',],
-    ]
 
-contactlist.sort()
 
-for i in range(len(contactlist)):
-    v=contactlist[i]
+import openpyxl
+
+work_book = openpyxl.load_workbook("/home/susil/Desktop/ContactBook_Python/sample.xlsx")
+sheet_1 = work_book['Sheet1']
+
+b=sheet_1['G1'].value
+t='D'+str(b)
+
+multiple_cells = sheet_1['A1':t]
+for row in multiple_cells:
+    v=[]
+    for cell in row:
+        v.append(cell.value)
     k.insert_at_end(v)
 
+# for i in range(len(contactlist)):
+#     v=contactlist[i]
+#     k.insert_at_end(v)
 
+#k.traverse_list()
 
 
 Name = StringVar()
@@ -140,7 +177,7 @@ Number = StringVar()
 Email = StringVar()
 Subject = StringVar()
 Body = StringVar()
-
+Other = StringVar()
 
 
 frame = Frame(root)
@@ -160,29 +197,29 @@ def Selected():
     
 
 def AddContact():
-    k.insert_at_end([Name.get(), Number.get(), Email.get()])
-    
+    k.insert_at_end([Name.get(), Number.get(), Email.get(), Other.get()])
     Select_set()
     
 
 def EDIT():
-    k.change(select.get(Selected()), Name.get(), Number.get(), Email.get())
+    k.change(select.get(Selected()), Name.get(), Number.get(), Email.get(), Other.get())
     Select_set()
     
 def DELETE():
-    
-    
     k.delete_element_by_value(select.get(Selected()))
-    
     Select_set()
-   
+    
 def VIEW():
     
     s = k.returned(select.get(Selected()))
     Name.set(s[0])
     Number.set(s[1])
     Email.set(s[2])
+    Other.set(s[3])
 
+def SAVE_EXIT():
+    k.backup()
+    root.destroy()
 
 def EXIT():
     root.destroy()
@@ -191,6 +228,7 @@ def RESET():
     Name.set('')
     Number.set('')
     Email.set('')
+    Other.set('')
 
 import smtplib
 from email.message import EmailMessage
@@ -239,7 +277,7 @@ def createNewWindow():
 
 
 def Select_set() :
-    contactlist.sort()
+    
     select.delete(0,END)
     k.sortList()
     k.insert_names()
@@ -255,6 +293,8 @@ Label(root, text = 'PHONE NO.', font='arial 12 bold',bg = 'SlateGray3').place(x=
 Entry(root, textvariable = Number).place(x= 130, y=45)
 Label(root, text = 'EMAIL', font='arial 12 bold',bg = 'SlateGray3').place(x= 30, y=80)
 Entry(root, textvariable = Email).place(x= 130, y=80)
+Label(root, text = 'OTHER', font='arial 12 bold',bg = 'SlateGray3').place(x= 270, y=80)
+Entry(root, textvariable = Other).place(x= 350, y=80)
 
 Button(root,text=" ADD", font='arial 12 bold',bg='SlateGray4', command = AddContact).place(x= 50, y=110)
 Button(root,text="EDIT", font='arial 12 bold',bg='SlateGray4',command = EDIT).place(x= 50, y=260)
@@ -263,6 +303,7 @@ Button(root,text="VIEW", font='arial 12 bold',bg='SlateGray4', command = VIEW).p
 Button(root,text="EXIT", font='arial 12 bold',bg='tomato', command = EXIT).place(x= 300, y=320)
 Button(root,text="RESET", font='arial 12 bold',bg='SlateGray4', command = RESET).place(x= 50, y=310)
 Button(root,text="MAIL", font='arial 12 bold',bg='SlateGray4', command = createNewWindow).place(x= 200, y=320)
+Button(root,text="SAVE AND EXIT", font='arial 12 bold',bg='tomato', command = SAVE_EXIT).place(x= 50, y=400)
 
 root.mainloop()
   
