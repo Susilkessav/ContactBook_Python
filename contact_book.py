@@ -148,7 +148,7 @@ root.title('Contact Book')
 root.resizable(0,0)
 k=DoublyLinkedList()
 
-
+#openpyyxl is to read or write the list in the xlsx sheet
 
 import openpyxl
 
