@@ -238,9 +238,9 @@ def SEND():
     
         msg= EmailMessage()
 
-        my_address ="ghnateesh10@gmail.com"    #sender address
+        my_address ="(ENTER YOUR EMAIL)"    #sender address
 
-        app_generated_password = "oqvgrejhgwhmbazp"    # gmail generated password
+        app_generated_password = "ENTER EMAIL API"    # gmail generated password
 
         msg["Subject"] = Subject.get()   #email subject 
 
